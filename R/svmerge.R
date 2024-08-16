@@ -311,5 +311,4 @@ add_ccf_to_output = function(base_dir, samples, test_run=T) {
   }
 }
 
-devtools::document()
 
