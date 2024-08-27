@@ -239,7 +239,7 @@ clonality_plot = function(matched_sv_fns) {
     clonality = dat[, grepl("X.*clonality", names(dat))]
     clonal = rowSums(as.matrix(clonality) == "Clonal", na.rm = T)
     subclonal = rowSums(as.matrix(clonality) == "Subclonal", na.rm = T)
-    n_sample = ncol(clonality)
+    n_sample = sum(grepl("X.*clonality", names(dat)))
     plot_df = data.frame(clonal, subclonal, n_sample, sample=tools::file_path_sans_ext(basename(file)))
     radius = 0.4
     noise1 = runif(min = -radius, max = radius, n=nrow(plot_df))
@@ -277,16 +277,22 @@ clonality_plot = function(matched_sv_fns) {
 #' folder structure of SVClone 
 #' @param test_run A boolean value which, if True, prevents the function from 
 #' writing any files.
-add_ccf_to_output = function(base_dir, samples, test_run=T) {
+#' @param snv A boolean which, if True, tells the function to use the sv version 
+#' of the files
+add_ccf_to_output = function(base_dir, samples, test_run=T, snv=F) {
   clonal_props = c()
+  snvstring = ""
+  if (sv) {
+    snvstring = "snvs/"
+  }
   for (sample in samples) {
-    print(paste0(base_dir, sample, "/ccube_out/", sample,"_ccube_sv_results.RData"))
+    print(paste0(base_dir, sample, "/ccube_out/", snvstring, sample,"_ccube_sv_results.RData"))
     
     # This gives you a file called doubleBreakPtsRes
-    load(paste0(base_dir, sample, "/ccube_out/", sample,"_ccube_sv_results.RData"))
+    load(paste0(base_dir, sample, "/ccube_out/", snvstring, sample,"_ccube_sv_results.RData"))
     
     # This is the file that SVClone gave us that should have the cluster, the number of SVs, and the proportion
-    sv_csv = read.table(paste0(base_dir, sample, "/ccube_out/", sample,"_subclonal_structure.txt"), header = T)
+    sv_csv = read.table(paste0(base_dir, sample, "/ccube_out/", snvstring, sample,"_subclonal_structure.txt"), header = T)
     sv_csv$CCF = doubleBreakPtsRes$res$full.model$ccfMean
     
     # Quality control check that proportion/CCF is always the same
@@ -304,9 +310,9 @@ add_ccf_to_output = function(base_dir, samples, test_run=T) {
     clonal_prop = sum(sv_csv$n_ssms[sv_csv$CCF >= 0.9])/sum(sv_csv$n_ssms)
     clonal_props = c(clonal_props, clonal_prop)
     if (!test_run) {
-      write.table(sv_csv, file=paste0(base_dir, sample, "/ccube_out/", sample,"_subclonal_structure_with_CCF_alan.txt"), row.names = F)
+      write.table(sv_csv, file=paste0(base_dir, sample, "/ccube_out/", snvstring, sample,"_subclonal_structure_with_CCF_alan.txt"), row.names = F)
     } else {
-      warning(paste("TEST RUN: ", paste0(base_dir, sample, "/ccube_out/", sample,"_subclonal_structure_with_CCF_alan.txt","\nUse the test_run=F flag to write")))
+      warning(paste("TEST RUN: ", paste0(base_dir, sample, "/ccube_out/", snvstring, sample,"_subclonal_structure_with_CCF_alan.txt","\nUse the test_run=F flag to write")))
     }
   }
 }
