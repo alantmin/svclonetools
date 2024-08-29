@@ -144,8 +144,8 @@ make_merged_table = function(sample_list, threshold = 500, CCF_cutoff=0.9) {
   
   all_samples = dplyr::bind_rows(ret$sample_list, .id = "column_label")
   classification = dplyr::group_by(all_samples, SV) 
-  classification = dplyr::summarise(classification, min_pos=min(min(pos1), min(pos2)),
-              max_pos=max(max(pos1), max(pos2)),
+  classification = dplyr::summarise(classification, pos1=min(pos1),
+              pos2=max(pos2),
               chr1=paste(unique(chr1), collapse="|"),
               chr2=paste(unique(chr2), collapse="|"),
               classification_list=paste(classification, collapse="|"))
