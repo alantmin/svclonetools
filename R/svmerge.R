@@ -214,7 +214,8 @@ write_merged_tables = function(sample_ids, patient_ids, cluster_certainty_fns, s
       cur_cluster_certainty_fns = cluster_certainty_fns[patient_ids == patient]
       cur_sv_info_fns = sv_info_fns[patient_ids == patient]
       cur_cluster_ccf_fns = cluster_ccf_fns[patient_ids == patient]
-      sample_list = make_sample_list(sample_ids, cur_cluster_certainty_fns, cur_cluster_ccf_fns, cur_sv_info_fns)
+      cur_sample_ids = sample_ids[patient_ids == patient]
+      sample_list = make_sample_list(cur_sample_ids, cur_cluster_certainty_fns, cur_cluster_ccf_fns, cur_sv_info_fns)
       ret = make_merged_table(sample_list, threshold=threshold)
       merged_list = ret$merged_list
       annotated_samples = ret$annotated_samples
